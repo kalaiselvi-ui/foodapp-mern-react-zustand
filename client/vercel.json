@@ -1,10 +1,11 @@
 {
-  "projects": {
-    "frontend": {
-      "rootDirectory": "client"
-    },
-    "backend": {
-      "rootDirectory": "server"
+  "version": 2,
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "client/dist" }
     }
-  }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
 }
