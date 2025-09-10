@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import {
-  useRestaurantStore,
-  type Restaurant,
-} from "@/store/useRestaurantStore";
+import { useRestaurantStore } from "@/store/useRestaurantStore";
+import type { Restaurant } from "@/components/ui/types";
 
 const SearchPage = () => {
   const { id } = useParams<{ id: string }>();
