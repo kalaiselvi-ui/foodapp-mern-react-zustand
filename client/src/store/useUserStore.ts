@@ -4,7 +4,7 @@ import axios from "axios";
 import type { LoginInputState, SignupInputState } from "@/schema/userSchema";
 import { toast } from "sonner";
 
-const API_END_POINT = "http://localhost:9000/api/user";
+const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/user";
 axios.defaults.withCredentials = true;
 
 type User = {

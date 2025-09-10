@@ -1,11 +1,10 @@
-import type { MenuFormSchema } from "@/schema/menuSchema";
 import axios from "axios";
 import { toast } from "sonner";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useRestaurantStore } from "./useRestaurantStore";
 
-const API_END_POINT = "http://localhost:9000/api/menu";
+const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/menu";
 axios.defaults.withCredentials = true;
 
 type menuState = {

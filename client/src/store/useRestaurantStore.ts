@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-const API_END_POINT = "http://localhost:9000/api/restaurant";
+const API_END_POINT =
+  "https://food-app-server-two-77.vercel.app/api/restaurant";
 axios.defaults.withCredentials = true;
 
 export const useRestaurantStore = create<RestaurantState>()(
