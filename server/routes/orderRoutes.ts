@@ -3,7 +3,6 @@ import { isAuth } from "../middlewares/isAuthenticated";
 import {
   createCheckoutSession,
   getOrders,
-  stripeWebhook,
 } from "../controllers/orderController";
 
 const orderRouter = express.Router();
