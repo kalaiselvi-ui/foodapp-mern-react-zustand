@@ -15,7 +15,13 @@ export const isAuth = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.cookies?.token;
+    // 1. Try to get token from cookies
+    let token = req.cookies?.token;
+
+    // 2. If not in cookies, try Authorization header
+    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
       return res
@@ -28,12 +34,10 @@ export const isAuth = async (
       | { userId?: string }
       | string;
 
-    // Check runtime type & existence
     if (!decoded || typeof decoded === "string" || !decoded.userId) {
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
 
-    // Attach the userId to the request object
     req.id = decoded.userId;
 
     next();

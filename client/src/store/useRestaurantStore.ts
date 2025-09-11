@@ -7,6 +7,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 const API_END_POINT =
   "https://food-app-server-two-77.vercel.app/api/restaurant";
 axios.defaults.withCredentials = true;
+const token = localStorage.getItem("token"); // JWT stored at login
 
 export const useRestaurantStore = create<RestaurantState>()(
   persist(
@@ -25,6 +26,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             {
               headers: {
                 "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
               },
               withCredentials: true,
             }
@@ -44,7 +46,11 @@ export const useRestaurantStore = create<RestaurantState>()(
       getRestaurant: async () => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/`);
+          const response = await axios.get(`${API_END_POINT}/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           if (response.data.success) {
             set({ loading: false, restaurant: response.data.restaurant });
           }
@@ -64,6 +70,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             {
               headers: {
                 "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
               },
               withCredentials: true,
             }
@@ -82,7 +89,11 @@ export const useRestaurantStore = create<RestaurantState>()(
       getSingleRestaurant: async (restaurantId: string) => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/${restaurantId}`);
+          const response = await axios.get(`${API_END_POINT}/${restaurantId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           if (response.data.success) {
             console.log(response.data);
             set({ loading: false, singleRestaurant: response.data.restaurant });
@@ -104,7 +115,12 @@ export const useRestaurantStore = create<RestaurantState>()(
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
           const response = await axios.get(
-            `${API_END_POINT}/search/${searchQuery}?${params.toString()}`
+            `${API_END_POINT}/search/${searchQuery}?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
           if (response.data.success) {
             console.log(response.data);
@@ -159,7 +175,11 @@ export const useRestaurantStore = create<RestaurantState>()(
       getRestaurantOrder: async () => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/order`);
+          const response = await axios.get(`${API_END_POINT}/order`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
           if (response.data.success) {
             set({ loading: false, restaurantOrders: response.data.orders });

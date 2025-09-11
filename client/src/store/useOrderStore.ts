@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/order";
 axios.defaults.withCredentials = true;
+const token = localStorage.getItem("token"); // JWT stored at login
 
 export const useOrderStore = create<OrderState>()(
   persist(
@@ -22,6 +23,7 @@ export const useOrderStore = create<OrderState>()(
             {
               headers: {
                 "Content-Type": "application/json", // ✅ use JSON
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -44,7 +46,11 @@ export const useOrderStore = create<OrderState>()(
         try {
           set({ loading: true });
 
-          const response = await axios.get(`${API_END_POINT}/get-order`);
+          const response = await axios.get(`${API_END_POINT}/get-order`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           set({ loading: false, orders: response.data.orders });
         } catch (err) {
           set({ loading: false });

@@ -6,6 +6,7 @@ import { useRestaurantStore } from "./useRestaurantStore";
 
 const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/menu";
 axios.defaults.withCredentials = true;
+const token = localStorage.getItem("token"); // JWT stored at login
 
 type menuState = {
   menu: null;
@@ -25,6 +26,7 @@ export const useMenuStore = create<menuState>()(
           const response = await axios.post(`${API_END_POINT}/add`, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
             withCredentials: true,
           });
@@ -49,6 +51,7 @@ export const useMenuStore = create<menuState>()(
             {
               headers: {
                 "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
               },
               withCredentials: true,
             }

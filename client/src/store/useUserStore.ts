@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/user";
 axios.defaults.withCredentials = true;
+const token = localStorage.getItem("token"); // JWT stored at login
 
 type User = {
   name: string;
@@ -116,7 +117,11 @@ export const useUserStore = create<UserState>()(
       checkAuthentication: async () => {
         try {
           set({ isCheckingAuth: true });
-          const response = await axios.get(`${API_END_POINT}/check-auth`);
+          const response = await axios.get(`${API_END_POINT}/check-auth`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           if (response.data.success) {
             set({
               user: response.data.user,
