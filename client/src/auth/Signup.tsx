@@ -5,7 +5,7 @@ import { userSignupSchema, type SignupInputState } from "@/schema/userSchema";
 import { useUserStore } from "@/store/useUserStore";
 import { Loader2, LockKeyhole, Mail, PhoneOutgoing, User } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { treeifyError } from "zod";
 
 const Signup = () => {
