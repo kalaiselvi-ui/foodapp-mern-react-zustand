@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Allow multiple origins
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://foodapp-client-react-zustand.vercel.app",
+];
 app.use(
   cors({
     origin: (origin, callback) => {
