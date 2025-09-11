@@ -8,7 +8,6 @@ import orderRouter from "./routes/orderRoutes"; // if stripeWebhook is exported 
 import bodyParser from "body-parser";
 import cookieParser = require("cookie-parser");
 import cors from "cors";
-import path from "path";
 import { stripeWebhook } from "./controllers/orderController";
 
 dotenv.config();

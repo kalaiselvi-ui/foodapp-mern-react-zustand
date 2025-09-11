@@ -4,11 +4,11 @@ import axios from "axios";
 import type { LoginInputState, SignupInputState } from "@/schema/userSchema";
 import { toast } from "sonner";
 
-const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/user";
+const API_END_POINT = import.meta.env.VITE_END_POINT || "http://localhost:9000";
 axios.defaults.withCredentials = true;
-const token = localStorage.getItem("token"); // JWT stored at login
 
 type User = {
+  _id: string;
   name: string;
   email: string;
   address: string;
@@ -21,6 +21,7 @@ type User = {
 
 type UserState = {
   user: User | null;
+  token: string; // store token here
   isAuth: boolean;
   isCheckingAuth: boolean;
   loading: boolean;
@@ -36,29 +37,34 @@ type UserState = {
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
+      token: localStorage.getItem("token") || "", // load token from localStorage
       isAuth: false,
       isCheckingAuth: true,
       loading: false,
 
-      // signup api
+      // SIGNUP
       signup: async (input: SignupInputState) => {
         set({ loading: true });
         try {
-          const response = await axios.post(`${API_END_POINT}/signup`, input, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            withCredentials: true,
-          });
+          const response = await axios.post(
+            `${API_END_POINT}/api/user/signup`,
+            input,
+            {
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
           if (response.data.success) {
-            toast.success(response.data.message);
+            localStorage.setItem("token", response.data.token); // save token
             set({
               loading: false,
               user: response.data.user,
               isAuth: true,
+              token: response.data.token,
             });
+            toast.success(response.data.message);
           }
         } catch (err: any) {
           set({ loading: false });
@@ -66,25 +72,27 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      // login api
+      // LOGIN
       login: async (input: LoginInputState) => {
         set({ loading: true });
         try {
-          const response = await axios.post(`${API_END_POINT}/login`, input, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            withCredentials: true,
-          });
-          if (response.data.success) {
-            localStorage.setItem("token", response.data.token);
+          const response = await axios.post(
+            `${API_END_POINT}/api/user/login`,
+            input,
+            {
+              headers: { "Content-Type": "application/json" },
+            }
+          );
 
-            toast.success(response.data.message);
+          if (response.data.success) {
+            localStorage.setItem("token", response.data.token); // save token
             set({
               loading: false,
               user: response.data.user,
               isAuth: true,
+              token: response.data.token, // store token in Zustand memory
             });
+            toast.success(response.data.message);
           }
         } catch (err: any) {
           set({ loading: false });
@@ -92,22 +100,34 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      // verify email api
+      // VERIFY EMAIL
       verifyEmail: async (verificationCode: string) => {
         set({ loading: true });
+        const token = get().token;
+        if (!token) {
+          toast.error("Login required");
+          return; // just exit, don't return a value
+        }
+
         try {
           const response = await axios.post(
-            `${API_END_POINT}/verify-email`,
+            `${API_END_POINT}/api/user/verify-email`,
             { verificationCode },
-            { headers: { "Content-Type": "application/json" } }
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
+
           if (response.data.success) {
-            toast.success(response.data.message);
             set({
               loading: false,
               user: response.data.user,
               isAuth: true,
             });
+            toast.success(response.data.message);
           }
         } catch (err: any) {
           set({ loading: false });
@@ -115,17 +135,20 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      // check auth api
+      // CHECK AUTH
       checkAuthentication: async () => {
         try {
           set({ isCheckingAuth: true });
-          const token = localStorage.getItem("token"); // get latest token
+          const token = get().token;
+          if (!token) throw new Error("No token");
 
-          const response = await axios.get(`${API_END_POINT}/check-auth`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `${API_END_POINT}/api/user/check-auth`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
           if (response.data.success) {
             set({
               user: response.data.user,
@@ -134,85 +157,84 @@ export const useUserStore = create<UserState>()(
             });
           }
         } catch (err: any) {
-          set({
-            isAuth: false,
-            isCheckingAuth: false,
-            user: null,
-          });
+          set({ isAuth: false, isCheckingAuth: false, user: null, token: "" });
+          localStorage.removeItem("token");
           toast.error(err.response?.data?.message || "Authentication failed");
         }
       },
 
-      // logout api
+      // LOGOUT
       logout: async () => {
         set({ loading: true });
         try {
-          const response = await axios.post(`${API_END_POINT}/logout`);
-          if (response.data.success) {
-            set({
-              loading: false,
-              isAuth: false,
-              user: null,
-            });
-            localStorage.removeItem("user-name");
-            toast.success(response.data.message);
-          }
+          const token = get().token;
+          await axios.post(
+            `${API_END_POINT}/api/user/logout`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          set({ loading: false, user: null, isAuth: false, token: "" });
+          localStorage.removeItem("token");
+          toast.success("Logged out successfully");
         } catch (err: any) {
           set({ loading: false });
           toast.error(err.response?.data?.message || "Logout failed");
         }
       },
 
-      // forgot password api
+      // FORGOT PASSWORD
       forgotPassword: async (email: string) => {
         try {
           set({ loading: true });
           const response = await axios.post(
-            `${API_END_POINT}/forgot-password`,
+            `${API_END_POINT}/api/user/forgot-password`,
             { email }
           );
-          if (response.data.success) {
-            set({ loading: false });
-            toast.success(response.data.message);
-          }
+          if (response.data.success) toast.success(response.data.message);
         } catch (err: any) {
-          set({ loading: false });
           toast.error(err.response?.data?.message || "Request failed");
+        } finally {
+          set({ loading: false });
         }
       },
 
-      // reset password api
-      resetPassword: async (newPassword: string, token: string) => {
+      // RESET PASSWORD
+      resetPassword: async (newPassword: string, tokenParam: string) => {
         try {
           set({ loading: true });
           const response = await axios.post(
-            `${API_END_POINT}/reset-password/${token}`,
+            `${API_END_POINT}/api/user/reset-password/${tokenParam}`,
             { newPassword }
           );
-          if (response.data.success) {
-            set({ loading: false });
-            toast.success(response.data.message);
-          }
+          if (response.data.success) toast.success(response.data.message);
         } catch (err: any) {
-          set({ loading: false });
           toast.error(err.response?.data?.message || "Reset failed");
+        } finally {
+          set({ loading: false });
         }
       },
 
-      // update profile api
+      // UPDATE PROFILE
       updateProfile: async (profileData: any) => {
+        const token = get().token;
+        if (!token) {
+          toast.error("Login required");
+          return; // just exit, don't return a value
+        }
         try {
           const response = await axios.put(
-            `${API_END_POINT}/profile/update`,
-            profileData
+            `${API_END_POINT}/api/user/profile/update`,
+            profileData,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
           );
-          console.log("API RESPONSE:", response.data);
 
           if (response.data.success) {
-            set(() => ({
-              isAuth: true,
-              user: response.data.user, // ✅ update user
-            }));
+            set({ user: response.data.user, isAuth: true });
             toast.success(response.data.message);
           }
         } catch (err: any) {
@@ -221,7 +243,7 @@ export const useUserStore = create<UserState>()(
       },
     }),
     {
-      name: "user-name", // key in localStorage
+      name: "user-store",
       storage: createJSONStorage(() => localStorage),
     }
   )

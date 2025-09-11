@@ -3,7 +3,8 @@ import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/order";
+const API_END_POINT = import.meta.env.VITE_END_POINT || "http://localhost:9000";
+
 axios.defaults.withCredentials = true;
 const token = localStorage.getItem("token"); // JWT stored at login
 
@@ -18,7 +19,7 @@ export const useOrderStore = create<OrderState>()(
         try {
           set({ loading: true });
           const response = await axios.post(
-            `${API_END_POINT}/checkout/create-checkout-session`,
+            `${API_END_POINT}/api/order/checkout/create-checkout-session`,
             checkoutSession,
             {
               headers: {
@@ -46,11 +47,14 @@ export const useOrderStore = create<OrderState>()(
         try {
           set({ loading: true });
 
-          const response = await axios.get(`${API_END_POINT}/get-order`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `${API_END_POINT}/api/order/get-order`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           set({ loading: false, orders: response.data.orders });
         } catch (err) {
           set({ loading: false });

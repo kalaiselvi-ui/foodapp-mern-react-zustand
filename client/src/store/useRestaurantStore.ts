@@ -4,10 +4,8 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-const API_END_POINT =
-  "https://food-app-server-two-77.vercel.app/api/restaurant";
+const API_END_POINT = import.meta.env.VITE_END_POINT || "http://localhost:9000";
 axios.defaults.withCredentials = true;
-const token = localStorage.getItem("token"); // JWT stored at login
 
 export const useRestaurantStore = create<RestaurantState>()(
   persist(
@@ -20,8 +18,13 @@ export const useRestaurantStore = create<RestaurantState>()(
       createRestaurant: async (formData: FormData) => {
         try {
           set({ loading: true });
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
           const response = await axios.post(
-            `${API_END_POINT}/create`,
+            `${API_END_POINT}/api/restaurant/create`,
             formData,
             {
               headers: {
@@ -46,7 +49,13 @@ export const useRestaurantStore = create<RestaurantState>()(
       getRestaurant: async () => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/`, {
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
+
+          const response = await axios.get(`${API_END_POINT}/api/restaurant/`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -64,8 +73,13 @@ export const useRestaurantStore = create<RestaurantState>()(
       updateRestaurant: async (formData: FormData) => {
         try {
           set({ loading: true });
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
           const response = await axios.put(
-            `${API_END_POINT}/update`,
+            `${API_END_POINT}/api/restaurant/update`,
             formData,
             {
               headers: {
@@ -89,11 +103,19 @@ export const useRestaurantStore = create<RestaurantState>()(
       getSingleRestaurant: async (restaurantId: string) => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/${restaurantId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
+          const response = await axios.get(
+            `${API_END_POINT}/api/restaurant/${restaurantId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           if (response.data.success) {
             console.log(response.data);
             set({ loading: false, singleRestaurant: response.data.restaurant });
@@ -108,22 +130,28 @@ export const useRestaurantStore = create<RestaurantState>()(
       searchRestaurant: async (searchQuery: string, selectedCuisines: any) => {
         try {
           set({ loading: true });
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
           const params = new URLSearchParams();
           // if (appliedFilter.length > 0) {
           //   params.append("selectedCuisines", appliedFilter.join(","));
           // }
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
-          console.log("Token sent:", token);
 
           const response = await axios.get(
-            `${API_END_POINT}/search/${searchQuery}?${params.toString()}`,
+            `${API_END_POINT}/api/restaurant/search/${searchQuery}?${params.toString()}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
+          console.log("Token sent search:", token);
+
           if (response.data.success) {
             console.log(response.data);
             set({
@@ -177,11 +205,19 @@ export const useRestaurantStore = create<RestaurantState>()(
       getRestaurantOrder: async () => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/order`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const token = localStorage.getItem("token"); // read latest token
+          if (!token) {
+            toast.error("Login required");
+            return; // just exit, don't return a value
+          }
+          const response = await axios.get(
+            `${API_END_POINT}/api/restaurant/order`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           if (response.data.success) {
             set({ loading: false, restaurantOrders: response.data.orders });
@@ -194,7 +230,7 @@ export const useRestaurantStore = create<RestaurantState>()(
       updateRestaurantOrder: async (orderId: string, status: string) => {
         try {
           const response = await axios.put(
-            `${API_END_POINT}/order/${orderId}/status`,
+            `${API_END_POINT}/api/restaurant/order/${orderId}/status`,
             { status },
             {
               headers: {

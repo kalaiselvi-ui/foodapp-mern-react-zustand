@@ -35,7 +35,7 @@ export const signup = async (req: Request, res: Response) => {
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
-    generateToken(res, user);
+    const token = generateToken(user);
     await sendVerificationEmail(email, verificationToken);
 
     const userwithoutpassword = await User.findOne({ email }).select(
@@ -45,6 +45,7 @@ export const signup = async (req: Request, res: Response) => {
       success: true,
       message: "Account created successfully",
       user: userwithoutpassword,
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -67,7 +68,8 @@ export const login = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, message: "Incorrect Password" });
     }
-    generateToken(res, user);
+    const token = generateToken(user);
+
     user.lastLogin = new Date();
     await user.save();
     const userwithoutpassword = await User.findOne({ email }).select(
@@ -77,6 +79,7 @@ export const login = async (req: Request, res: Response) => {
       success: true,
       message: `Welcome back ${user.name}`,
       user: userwithoutpassword,
+      token: token,
     });
   } catch (err) {
     console.error(err);

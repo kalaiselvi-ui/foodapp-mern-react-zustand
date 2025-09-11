@@ -4,7 +4,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useRestaurantStore } from "./useRestaurantStore";
 
-const API_END_POINT = "https://food-app-server-two-77.vercel.app/api/menu";
+const API_END_POINT = import.meta.env.VITE_END_POINT || "http://localhost:9000";
+
 axios.defaults.withCredentials = true;
 const token = localStorage.getItem("token"); // JWT stored at login
 
@@ -23,13 +24,17 @@ export const useMenuStore = create<menuState>()(
       createMenu: async (formData: FormData) => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/add`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-            withCredentials: true,
-          });
+          const response = await axios.post(
+            `${API_END_POINT}/api/menu/add`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            }
+          );
           if (response.data.success) {
             toast.success(response.data.message);
             set({ loading: false, menu: response.data.menu });
@@ -46,7 +51,7 @@ export const useMenuStore = create<menuState>()(
         try {
           set({ loading: true });
           const response = await axios.put(
-            `${API_END_POINT}/edit/${menuId}`,
+            `${API_END_POINT}/api/menu/edit/${menuId}`,
             formData,
             {
               headers: {
