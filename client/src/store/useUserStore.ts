@@ -77,6 +77,8 @@ export const useUserStore = create<UserState>()(
             withCredentials: true,
           });
           if (response.data.success) {
+            localStorage.setItem("token", response.data.token);
+
             toast.success(response.data.message);
             set({
               loading: false,
@@ -117,6 +119,8 @@ export const useUserStore = create<UserState>()(
       checkAuthentication: async () => {
         try {
           set({ isCheckingAuth: true });
+          const token = localStorage.getItem("token"); // get latest token
+
           const response = await axios.get(`${API_END_POINT}/check-auth`, {
             headers: {
               Authorization: `Bearer ${token}`,

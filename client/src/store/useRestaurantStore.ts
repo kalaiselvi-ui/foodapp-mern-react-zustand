@@ -114,6 +114,8 @@ export const useRestaurantStore = create<RestaurantState>()(
           // }
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
+          console.log("Token sent:", token);
+
           const response = await axios.get(
             `${API_END_POINT}/search/${searchQuery}?${params.toString()}`,
             {
