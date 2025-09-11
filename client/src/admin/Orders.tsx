@@ -20,8 +20,7 @@ export const OrderStatusOptions = [
 ];
 
 const Orders = () => {
-  const { getRestaurantOrder, updateRestaurantOrder, restaurantOrders } =
-    useRestaurantStore();
+  const { getRestaurantOrder, restaurantOrders } = useRestaurantStore();
 
   useEffect(() => {
     console.log(restaurantOrders);

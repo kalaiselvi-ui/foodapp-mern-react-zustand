@@ -17,7 +17,6 @@ const Signup = () => {
   });
   const [error, setError] = useState<Partial<SignupInputState>>({});
   const { signup, loading } = useUserStore();
-  const navigate = useNavigate();
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });

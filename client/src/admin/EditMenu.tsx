@@ -23,7 +23,6 @@ import {
 } from "@/schema/menuSchema";
 import type { MenuFormErrors } from "@/components/ui/types";
 import { useMenuStore } from "@/store/useMenuStore";
-import { useRestaurantStore } from "@/store/useRestaurantStore";
 
 interface EditMenuProps {
   selectedMenu: Menu;

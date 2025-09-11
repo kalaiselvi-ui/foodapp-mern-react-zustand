@@ -30,7 +30,7 @@ const AddMenu = () => {
   const [error, setError] = useState<Partial<MenuFormErrors>>({});
   const [editOpen, setEditOpen] = useState<boolean>(false);
   const { loading, createMenu } = useMenuStore();
-  const { restaurant, getRestaurant } = useRestaurantStore();
+  const { restaurant } = useRestaurantStore();
   const [selectedMenu, setSelectedMenu] = useState<any>();
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {

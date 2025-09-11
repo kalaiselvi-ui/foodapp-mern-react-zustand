@@ -1,4 +1,4 @@
-import { file, z } from "zod";
+import { z } from "zod";
 
 export const restaurantAddSchema = z.object({
   restaurantName: z.string().min(3, { message: "Restaurant name is required" }),

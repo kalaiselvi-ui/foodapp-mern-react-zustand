@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import CheckoutPage from "./CheckoutPage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
