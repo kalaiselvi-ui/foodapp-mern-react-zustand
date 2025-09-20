@@ -5,13 +5,16 @@ import { Button } from "./button";
 import { useOrderStore } from "@/store/useOrderStore";
 import { useEffect } from "react";
 import type { Orders } from "./types";
+import { useCartStore } from "@/store/useCartStore";
 const Success = () => {
   const { orders, getOrderDetails } = useOrderStore();
+  const clearCart = useCartStore((state) => state.clearCart);
 
   useEffect(() => {
     getOrderDetails();
     console.log(orders);
-  }, []);
+    clearCart();
+  }, [getOrderDetails, clearCart]);
 
   if (orders.length === 0) {
     return (
